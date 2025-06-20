@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>顧客詳細</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2 class="mb-4">顧客詳細情報</h2>
+      <div id="customer-detail">
+        <p><strong>顧客ID:</strong> <span id="customer-id"></span></p>
+        <p><strong>会社名:</strong> <span id="company-name"></span></p>
+        <p><strong>業種:</strong> <span id="industry"></span></p>
+        <p><strong>連絡先:</strong> <span id="contact"></span></p>
+        <p><strong>所在地:</strong> <span id="location"></span></p>
+      </div>
+      <a href="list.html" class="btn btn-secondary mt-3">← 📚 一覧に戻る</a>
+      <button id="delete-button" class="btn btn-danger mt-3">
+        💀 削除する
+      </button>
+      <button id="update-button" class="btn btn-info mt-3">✍ 更新する</button>
+    </div>
+
+    <script type="module">
+      import config from "../config.js";
+
+      // URLからIDを取得
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+      // 顧客詳細取得処理
+      if (!id) {
+        alert("顧客IDが指定されていません");
+      } else {
+        fetch(`${config.apiUrl}/customers/${id}`)
+          .then((res) => {
+            if (!res.ok) {
+              return res.text().then((text) => {
+                throw new Error(`HTTP ${res.status} - ${text}`);
+              });
+            }
+            return res.json();
+          })
+          .then((customer) => {
+            // 更新画面で取得できるようにsessionStorage に保存する
+            sessionStorage.setItem("customerData", JSON.stringify(customer));
+            document.getElementById("customer-id").textContent =
+              customer.customer_id || "―";
+            document.getElementById("company-name").textContent =
+              customer.company_name || "―";
+            document.getElementById("industry").textContent =
+              customer.industry || "―";
+            document.getElementById("contact").textContent =
+              customer.contact || "―";
+            document.getElementById("location").textContent =
+              customer.location || "―";
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("顧客情報の取得に失敗しました");
+          });
+      }
+
+      // 削除処理
+      document
+        .getElementById("delete-button")
+        .addEventListener("click", function () {
+          // 確認ダイアログ
+          if (!window.confirm("本当に削除しますか?")) {
+            return;
+          }
+          fetch(config.apiUrl + `/delete-customer/${id}`, {
+            method: "DELETE",
+            // headers: {
+            //   "Content-Type": "application/x-www-form-urlencoded",
+            // },
+          })
+            .then((response) => {
+              if (response.status === 204) {
+                alert("顧客情報が正常に削除されました。");
+                sessionStorage.removeItem("customerData");
+                window.location.href = "list.html";
+                // フォームをリセット
+                // document.getElementById("customer-form").reset();
+              } else {
+                return response.json().then((data) => {
+                  console.error(data);
+                  alert("削除に失敗しました。");
+                });
+              }
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+
+      // 更新処理
+      document
+        .getElementById("update-button")
+        .addEventListener("click", function () {
+          const customerString = sessionStorage.getItem("customerData");
+          const customerId = JSON.parse(customerString).customer_id;
+          window.location.href = `update.html?id=${customerId}`;
+        });
+    </script>
+  </body>
+</html>

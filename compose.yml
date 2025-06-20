@@ -14,7 +14,7 @@ services:
     container_name: nodejs
     image: node:22-bullseye
     ports:
-      - "1985:1985"
+      - "4183:4183"
     volumes:
       - ./src/node:/app
       - ./work:/work
