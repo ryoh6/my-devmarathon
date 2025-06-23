@@ -6,6 +6,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
     steps:
       - id: ssh
         uses: invi5H/ssh-action@v1
