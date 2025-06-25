@@ -1,5 +1,5 @@
 const config = {
-  apiUrl: "http://localhost:4183",
+  apiUrl: "/api_ryohei_yamamoto",
 };
 
 export default config;
