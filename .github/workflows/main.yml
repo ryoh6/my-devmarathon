@@ -34,4 +34,6 @@ jobs:
           SSH_PORT: ${{ secrets.PROD_SSH_PORT }}
           SSH_USER: ${{ secrets.PROD_SSH_USER }}
           SSH_KEY: ${{ secrets.PROD_SSHE_SSH_KEY }}
-      - run: ssh ${{ steps.ssh.outputs.SERVER }} bash /app/ryohei_yamamoto/deploy.sh ryohei_yamamoto
+      - run: |
+          ssh ${{ steps.ssh.outputs.SERVER }} \
+          "DB_NAME='${{ secrets.DB_NAME }}' DB_USER='${{ secrets.DB_USER }}' DB_PASS='${{ secrets.DB_PASS }}' bash /app/ryohei_yamamoto/deploy.sh ryohei_yamamoto"
